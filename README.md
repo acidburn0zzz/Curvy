@@ -59,7 +59,7 @@ Use:
         
 Development: 
 
-    As of now, Curvy is for my own personal use. However, since Curvy.js rests on github publicly, contributions are more than welcome. Please fork the project and suggest improvments if you wish. Thanks! 
+    As of now, Curvy is for my own personal use. However, since Curvy.js rests on github publicly, contributions are more than welcome. Please fork the project and suggest improvements if you wish. Thanks! 
     
     
     
