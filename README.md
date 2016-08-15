@@ -48,7 +48,7 @@ Use:
         
         Curvy finds a suitable a and b value so that the curve will flow through both values.
         
-        NOTE: As of now curvy does hold minamal support for adding measurments types to curvy values. For Example, data-curvy-width="default 300px 16% 1200px 5%" is completly acceptable input. However, there is no reason to include these measurments and they effectivly hold no meaning to curvy. They are simply discarded.  
+        NOTE: As of now curvy does hold minamal support for adding measurments to curvy values. For Example, data-curvy-width="default 300px 16% 1200px 5%" is completly acceptable input. However, there is no reason to include these measurments and they effectivly hold no meaning to curvy. They are simply discarded.  
     
     As of now only the following curves are supoprted: 
         
