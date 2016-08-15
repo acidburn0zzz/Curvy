@@ -52,8 +52,6 @@ Curvy.private.load = function() {
     Curvy.private.init(); 
     Curvy.private.consoleOut("Initialized Variables...");
     
-    Curvy.private.consoleOut("Processing Curves");
-    
     //Function to process Curves
     Curvy.private.process();
     
