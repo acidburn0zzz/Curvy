@@ -1,7 +1,7 @@
 
 
 Description: 
-    Cuvy is a an easy to use layout tool that allows the sizing and positioning of HTML elements to follow non-linear paths as the screen width and height increase/decrease. When used correctly, Curvy can keep a website looking great on a wide varitey of screen sizes. 
+    Curvy is a an easy to use layout tool that allows the sizing and positioning of HTML elements to follow non-linear paths as the screen width and height increase/decrease. When used correctly, Curvy can keep a website looking great on a wide varitey of screen sizes. 
     
     However, It is mostly used for quick and dirty prototyping. 
     
