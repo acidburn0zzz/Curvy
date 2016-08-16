@@ -8,7 +8,7 @@
 // Creating Curvy object
 var Curvy = {
     INFO: { VERSION: 0.02, STABLE: false, USABLE: true },
-    private: { opts: {}, objs: {}, math: {}, size : {} }, //for methods that shouldn't be acessed outside of this js file.
+    private: { opts: {}, objs: {}, math: {}, size : {} }, //for methods that shouldn't be accessed outside of this js file.
     get: {}, //for getting things like the numer of styles sheets or event listeners ect.
     set: {}, //for setting options
     manager: {} //for routine managing functions to be used outside the the Curvy.js file.
