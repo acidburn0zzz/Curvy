@@ -52,6 +52,8 @@ Curvy.private.load = function() {
     Curvy.private.init(); 
     Curvy.private.consoleOut("Initialized Variables...");
     
+    Curvy.private.consoleOut("Processing Curves");
+    
     //Function to process Curves
     Curvy.private.process();
     
@@ -137,6 +139,67 @@ Curvy.manager.forceResize = function() {
     Curvy.private.size.onResize();
 };
 
+
+//Adds curve by class
+Curvy.set.newCurve = function(value) {
+    Curvy.private.parseCurve(value);
+};
+
+//takes a value of "class tag curvetype px % px %"
+Curvy.private.parseCurve = function(value) {
+    var vo = {};
+    var cos = {};
+    var htmlObjs = [];
+    var atts = [];
+    var clss = "";
+    var tag = "";
+    var crv = "";
+    var i;
+    
+    atts = value.split(' ');
+    
+    clss = atts[0];
+    tag = atts[1];
+    
+    i=2;
+    while(i<atts.length) {
+        crv += atts[i].replace(/ */g,"") + " ";
+        i++;
+    }
+    
+    vo = Curvy.private.processCurvyAttr(crv);
+    
+    htmlObjs = Curvy.get.allCElementsOfClass(clss);
+    
+    switch(vo.type) {
+        case "default": cos = Curvy.get.defaultCos(vo.x1, vo.y1, vo.x2, vo.y2);
+            break;
+        case "linear": cos = Curvy.get.linearCos(vo.x1, vo.y1, vo.x2, vo.y2);
+            break;
+        case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
+            break;
+        default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
+    }
+    
+    
+    i=0;
+    while(i<htmlObjs.length) {
+        Curvy.private.objs.curves.push(
+            {
+                type: vo.type,
+                attribute: tag,
+                element: htmlObjs[i],
+                icos: cos //has elements a and b for coefficients.
+            }
+        );
+        Curvy.private.consoleOut(vo.type + " curve added using class " + clss);
+        i++
+    }
+    
+    Curvy.private.size.onResize();
+    
+};
+
 //END BASIC FUNCTIONS
 
 
@@ -192,6 +255,7 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
     
     var cos = {};
     
+    
     switch(vo.type) {
         case "default": cos = Curvy.get.defaultCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
@@ -199,7 +263,7 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
             break;
         case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
-        default: Curvy.private.consoleOut("ERROR: " + vo.type + "is not a valid curve...");
+        default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
             return null;
     }
     
@@ -230,15 +294,16 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     atts = attrValue.split(' ');
     
     //error checking, if atts is not 5 then error
-    if(atts.length == 5) {
+    if(atts.length >= 5) {
         valueObject.type = atts[0];
         
         valueObject.x1 = Number(atts[1].replace(/px/i, ""));
         valueObject.y1 = Number(atts[2].replace(/%/i, ""));
         valueObject.x2 = Number(atts[3].replace(/px/i, ""));
         valueObject.y2 = Number(atts[4].replace(/%/i, ""));
-    } else
+    } else 
         Curvy.private.consoleOut("ERROR: Invalid Curvy Value");
+        
     
     return valueObject;
     
@@ -479,6 +544,11 @@ Curvy.get.allCElements = function(type) {
     }
             
     return allCElements;
+};
+
+//gets all elements of class type
+Curvy.get.allCElementsOfClass = function(type) {
+    return document.getElementsByClassName(type);
 };
 
 //MATH FUNCTIONS
