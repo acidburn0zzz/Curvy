@@ -184,14 +184,7 @@ Curvy.private.parseCurve = function(value) {
     
     i=0;
     while(i<htmlObjs.length) {
-        Curvy.private.objs.curves.push(
-            {
-                type: vo.type,
-                attribute: tag,
-                element: htmlObjs[i],
-                icos: cos //has elements a and b for coefficients.
-            }
-        );
+        Curvy.private.objs.curves.push(new CurvyObj(vo.type, tag, htmlObjs[i], cos));
         Curvy.private.consoleOut(vo.type + " curve added using class " + clss);
         i++
     }
@@ -204,6 +197,14 @@ Curvy.private.parseCurve = function(value) {
 
 
 //START CURVE PROCESSING FUNCTIONS 
+
+//CurvyObj Def
+function CurvyObj(type, attr, element, icos) {
+    this.type = type;
+    this.attribute = attr;
+    this.element = element;
+    this.icos = icos;
+}
 
 //on htmlObj resize 
 Curvy.private.size.Resize = function(curvyObj) { 
@@ -240,18 +241,12 @@ Curvy.private.size.onResize = function() {
     
 };
 
-
 //process curvy tag
 Curvy.private.processCurvyTag = function(htmlObj, attrName) {
     var vo = Curvy.private.processCurvyAttr(htmlObj.getAttribute(attrName));
     
     //new object to use for tag resize this will probaly be the standard obj
-    var curvyObj = {
-        type: vo.type,
-        attribute: attrName,
-        element: htmlObj,
-        icos: {} //has elements a and b for coefficients.
-    };
+    var curvyObj = new CurvyObj(vo.type, attrName, htmlObj, {});
     
     var cos = {};
     
