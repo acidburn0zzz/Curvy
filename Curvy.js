@@ -9,7 +9,7 @@
 var Curvy = {
     INFO: { VERSION: 0.02, STABLE: false, USABLE: true },
     private: { opts: {}, objs: {}, math: {}, size : {} }, //for methods that shouldn't be accessed outside of this js file.
-    get: {}, //for getting things like the numer of styles sheets or event listeners ect.
+    get: {}, //for getting things.
     set: {}, //for setting options
     manager: {} //for routine managing functions to be used outside the the Curvy.js file.
 };
@@ -24,7 +24,7 @@ Curvy.private.opts.logging = true;
 
 Curvy.private.init = function() {
     
-    //Gets all elements contining Curvy Attributes
+    //Gets all elements containing Curvy Attributes
     Curvy.private.consoleOut("Finding Curvy things...");
     Curvy.private.objs.allCwidth = Curvy.get.allCElements("curvy-width");
     Curvy.private.objs.allCheight = Curvy.get.allCElements("curvy-height");
