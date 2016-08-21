@@ -31,9 +31,11 @@ Use:
     No matter what the attribute, Curvy accepts the same value type.
     
         A width example: data-curvy-width="default 300 16 1200 5" 
+        
+        Another width example: curvy-width="tanh 4:3 20% 16:9 15%"
     
     The first element in the attribute value is the curve type. The default curve is
-    the derivitive of ln(x) or 1/x. The other four attribute values are the beginning and end of the curve you would like an element to follow. The example above would produce a default curve that outputs a width value of 16% when the parent element (or window) is 300px wide and 5% when the parent element is 1200px wide. 
+    the derivitive of ln(x) or 1/x. The other four attribute values are the begining and end of the curve you would like an element to follow. The first example above would produce a default curve that outputs a width value of 16% when the parent element (or window) is 300px wide and 5% when the parent element is 1200px wide. The second example sets a 20% width when the screen or parent width-to-height ratio is 4:3 and 15% when the ratio is 16:9. 
     
         To Clarfiy the Above example one more time:
         
@@ -56,6 +58,12 @@ Use:
         linear          A very simple linear curve. Essentially useless for production.
         tanh            A curve utilizing hyperbolic tangent. 
         
+    It is possible to apply curves to an entire CSS class in javascript:
+        
+        Curvy.set.newCurve("curvy-class curvy-width tanh 4:3 20% 21:9 12%");
+        
+    The last 5 attributes are identical to that of the Curvy HTML attributes. The first attribute is the class name, and the second attribute is the name of the Curvy HTML attribute that is supposed to be applied to the class.  
+    
         
 Development: 
 
