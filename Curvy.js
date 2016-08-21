@@ -274,7 +274,7 @@ Curvy.private.processCurvyAttr = function(attrValue) {
             
             temp = atts[3].split(':');
             
-            valueObject.x3 = Number(temp[0])/Number(temp[1]);
+            valueObject.x2 = Number(temp[0])/Number(temp[1]);
 
             valueObject.mode = 1;
             
@@ -518,6 +518,7 @@ Curvy.private.math.getMatrixInverse22 = function(matrix) {
     var det;
     var invmatrix = [0,0,0,0];
     
+    
     if(matrix.length == 4) {
         
         //checks to see if matrix is invertable
@@ -535,6 +536,8 @@ Curvy.private.math.getMatrixInverse22 = function(matrix) {
                 
         }
     }
+    
+    //alert(invmatrix[0]);
     
     return  invmatrix;
 };
@@ -606,7 +609,6 @@ Curvy.get.tanhCos = function(x1, y1, x2, y2) {
     
     vec.c = linVec.a;
     vec.d = linVec.b;
-    
     
     return vec;
 };
