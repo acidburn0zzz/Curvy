@@ -68,61 +68,29 @@ Curvy.private.load = function() {
 
 //Where all tags are processed, may be recalled 
 Curvy.private.process = function() {
-    var i = 0;
     
     Curvy.private.consoleOut("Processing Curves...");
     
-    //FOR LOOPS NEED TO BE RETHOUGHT
+    Curvy.private.processAllOfType(Curvy.private.objs.allCwidth);
+    Curvy.private.processAllOfType(Curvy.private.objs.allCheight);
+    Curvy.private.processAllOfType(Curvy.private.objs.allCtop);
+    Curvy.private.processAllOfType(Curvy.private.objs.allCbottom);
+    Curvy.private.processAllofType(Curvy.private.objs.allCleft);
+    Curvy.private.processAllOfType(Curvy.private.objs.allCright);
     
-    //curvy-width elements
-    for(i=0; i<Curvy.private.objs.allCwidth.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCwidth[i].element, 
-                Curvy.private.objs.allCwidth[i].curvyAttr
-            ));
-    
-    //curvy-height elements
-    for(i=0; i<Curvy.private.objs.allCheight.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCheight[i].element,
-                Curvy.private.objs.allCheight[i].curvyAttr
-            ));
-    
-    //curvy-top elements
-    for(i=0; i<Curvy.private.objs.allCtop.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCtop[i].element,
-                Curvy.private.objs.allCtop[i].curvyAttr
-            ));
-    
-    //curvy-bottom elements
-    for(i=0; i<Curvy.private.objs.allCbottom.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCbottom[i].element,
-                Curvy.private.objs.allCbottom[i].curvyAttr
-            ));
-    
-    //curvy-left elements
-    for(i=0; i<Curvy.private.objs.allCleft.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCleft[i].element,
-                Curvy.private.objs.allCleft[i].curvyAttr
-            ));
-    
-    //curvy-right elements
-    for(i=0; i<Curvy.private.objs.allCright.length; i++)
-        Curvy.private.objs.curves.push(
-            Curvy.private.processCurvyTag(
-                Curvy.private.objs.allCright[i].element,
-                Curvy.private.objs.allCright[i].curvyAttr
-            ));
 };
 
+
+Curvy.private.processAllOfType = function(basicObj){
+    var i;
+    
+    for(i=0; i<basicObj.length; i++)
+        Curvy.private.objs.curves.push(
+            Curvy.private.processCurvyTag(
+            basicObj[i].element,
+            basicObj[i].curvyAttr
+        ));
+};
 
 //Used when a Curve Style is added or removed after the initial Load
 Curvy.manager.reLoad = function() {
@@ -184,7 +152,7 @@ Curvy.private.parseCurve = function(value) {
     
     i=0;
     while(i<htmlObjs.length) {
-        Curvy.private.objs.curves.push(new CurvyObj(vo.type, tag, htmlObjs[i], cos));
+        Curvy.private.objs.curves.push(new CurvyObj(vo.type, tag, htmlObjs[i], cos, vo.mode));
         Curvy.private.consoleOut(vo.type + " curve added using class " + clss);
         i++
     }
@@ -199,11 +167,12 @@ Curvy.private.parseCurve = function(value) {
 //START CURVE PROCESSING FUNCTIONS 
 
 //CurvyObj Def
-function CurvyObj(type, attr, element, icos) {
+function CurvyObj(type, attr, element, icos, mode) {
     this.type = type;
     this.attribute = attr;
     this.element = element;
     this.icos = icos;
+    this.mode = mode;
 }
 
 //on htmlObj resize 
@@ -246,7 +215,7 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
     var vo = Curvy.private.processCurvyAttr(htmlObj.getAttribute(attrName));
     
     //new object to use for tag resize this will probaly be the standard obj
-    var curvyObj = new CurvyObj(vo.type, attrName, htmlObj, {});
+    var curvyObj = new CurvyObj(vo.type, attrName, htmlObj, {}, vo.mode);
     
     var cos = {};
     
@@ -274,9 +243,12 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
 
 //process default curvy value
 Curvy.private.processCurvyAttr = function(attrValue) {
-  
+    
+    var temp = [];
+    
     var valueObject = {
         type: "",
+        mode: 0,
         x1: 0,
         x2: 0,
         y1: 0,
@@ -288,14 +260,32 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     
     atts = attrValue.split(' ');
     
-    //error checking, if atts is not 5 then error
+    //error checking, if atts is not 5 then error NEEDS MORE ERROR CHECKING!!! 
     if(atts.length >= 5) {
         valueObject.type = atts[0];
         
-        valueObject.x1 = Number(atts[1].replace(/px/i, ""));
-        valueObject.y1 = Number(atts[2].replace(/%/i, ""));
-        valueObject.x2 = Number(atts[3].replace(/px/i, ""));
-        valueObject.y2 = Number(atts[4].replace(/%/i, ""));
+        if(atts[2].match(/:/i) != null || atts[4].match(/:/i) != null) {
+            //if screen res 
+            valueObject.y1 = Number(atts[2].replace(/%/i, ""));
+            valueObject.y2 = Number(atts[4].replace(/%/i, ""));
+            
+            temp = atts[1].split(':');
+            
+            valueObject.x1 = Number(temp[0])/Number(temp[1]);
+            
+            temp = atts[3].split(':');
+            
+            valueObject.x3 = Number(temp[0])/Number(temp[1]);
+            
+            valueObject.mode = 1;
+            
+            
+        } else {
+            valueObject.x1 = Number(atts[1].replace(/px/i, ""));
+            valueObject.y1 = Number(atts[2].replace(/%/i, ""));
+            valueObject.x2 = Number(atts[3].replace(/px/i, ""));
+            valueObject.y2 = Number(atts[4].replace(/%/i, ""));
+        }
     } else 
         Curvy.private.consoleOut("ERROR: Invalid Curvy Value");
         
@@ -306,7 +296,6 @@ Curvy.private.processCurvyAttr = function(attrValue) {
 
 
 //END CURVE PROCESSING FUNCTIONS
-
 
 
 //START DEFAULT SIZING TOOLS
@@ -354,157 +343,133 @@ Curvy.private.size.tanh = function(curvyObj, fixedX, normalX) {
 
 //END DEFAULT SIZING TOOLS
 
+//START CONTROLLER HELPERS
+
+Curvy.get.parentElementRatio = function(element) {
+    return (element.parentElement.offsetWidth/element.parentElement.offsetHeight);  
+};
+
+Curvy.get.windowRatio = function(element) {
+    return (window.innerWidth/window.innerHeight);  
+};
+
+//fixedSize and otherSize are the sizes Curvy uses when element is in either fixed or other positioning
+Curvy.private.size.computeStyle = function(CurvyObj, fixedSize, otherSize) {
+    var finalStyle;
+    
+    if(curvyObj.mode == 0)
+        switch(curvyObj.type) {
+            case "default": finalStyle = Curvy.private.size.default(
+                curvyObj,
+                fixedSize,
+                otherSize
+            );
+                break;
+            case "linear": finalStyle = Curvy.private.size.linear(
+                curvyObj,
+                fixedSize,
+                otherSize
+            );
+                break;
+            case "tanh": finalStyle = Curvy.private.size.tanh(
+                curvyObj,
+                fixedSize,
+                otherSize
+            ); 
+                break;
+            default: Curvy.private.consoleOut("ERROR: in private.size.computeStyle");
+        }    
+    else if(curvyObj.mode == 1) {
+        switch(curvyObj.type) {
+            case "default": finalStyle = Curvy.private.size.default(
+                curvyObj,
+                Curvy.get.windowRatio(),
+                Curvy.get.parentElementRatio(curvyObj.element)
+            );
+                break;
+            case "linear": finalStyle = Curvy.private.size.linear(
+                curvyObj,
+                Curvy.get.windowRatio(),
+                Curvy.get.parentElementRatio(curvyObj.element)
+            );
+                break;
+            case "tanh": finalStyle = Curvy.private.size.tanh(
+                curvyObj,
+                Curvy.get.windowRatio(),
+                Curvy.get.parentElementRatio(curvyObj.element)
+            ); 
+                break;
+            default: Curvy.private.consoleOut("ERROR: in private.size.computeStyle");
+        }    
+    }
+    
+    return finalStyle;
+    
+} ;
+
+
+//END CONTROLLER HELPERS
 
 //START CONTROLLERS
 
 //WIDTH CONTROLLER: CONTROLS WHAT CURVES ARE SUPORTED BY EACH TAG.
-Curvy.private.size.width = function(curvyObj) {
-    switch(curvyObj.type) {
-        case "default": curvyObj.element.style.width = Curvy.private.size.default(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "linear": curvyObj.element.style.width = Curvy.private.size.linear(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "tanh": curvyObj.element.style.width = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.width");
-    }
+Curvy.private.size.width = function(curvyObj) {    
+    
+    curvyObj.element.style.width = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerWidth, 
+        CurvyObj.element.parentElement.offsetWidth
+    );
 };
 
 //HEIGHT CONTROLLER: SHOULD SUPPORT ALL TAGS
 Curvy.private.size.height = function(curvyObj) {
-    switch(curvyObj.type) {
-        case "default": curvyObj.element.style.height = Curvy.private.size.default(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "linear": curvyObj.element.style.height = Curvy.private.size.linear(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "tanh": curvyObj.element.style.height = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.height");
-    }
+     
+    curvyObj.element.style.height = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerHeight, 
+        CurvyObj.element.parentElement.offsetHeight
+    );
 };
 
 //TOP CONTROLLER
 Curvy.private.size.top = function(curvyObj) {
-    switch(curvyObj.type) {
-        case "default": curvyObj.element.style.top = Curvy.private.size.default(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "linear": curvyObj.element.style.top = Curvy.private.size.linear(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "tanh": curvyObj.element.style.top = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.top");
-    }
+    
+    curvyObj.element.style.top = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerHeight, 
+        CurvyObj.element.parentElement.offsetHeight
+    );
 };
 
 //BOTTOM CONTROLLER
 Curvy.private.size.bottom = function(curvyObj) {
-    switch(curvyObj.type) {
-        case "default": curvyObj.element.style.bottom = Curvy.private.size.default(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "linear": curvyObj.element.style.bottom = Curvy.private.size.linear(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        );
-            break;
-        case "tanh": curvyObj.element.style.bottom = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerHeight,
-            curvyObj.element.parentElement.offsetHeight
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.bottom");
-    }
+    
+    curvyObj.element.style.bottom = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerHeight, 
+        CurvyObj.element.parentElement.offsetHeight
+    );
 };
 
 //LEFT CONTROLLER
 Curvy.private.size.left = function(curvyObj) {
-    switch(curvyObj.type) {
-        case "default": curvyObj.element.style.left = Curvy.private.size.default(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "linear": curvyObj.element.style.left = Curvy.private.size.linear(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "tanh": curvyObj.element.style.left = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.left");
-    }
+    
+    curvyObj.element.style.left = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerWidth, 
+        CurvyObj.element.parentElement.offsetWidth
+    );
 };
 
 //RIGHT CONTROLLER
 Curvy.private.size.right = function(curvyObj) {
-  switch(curvyObj.type) {
-        case "default": curvyObj.element.style.right = Curvy.private.size.default(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "linear": curvyObj.element.style.right = Curvy.private.size.linear(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        );
-            break;
-        case "tanh": curvyObj.element.style.right = Curvy.private.size.tanh(
-            curvyObj,
-            window.innerWidth,
-            curvyObj.element.parentElement.offsetWidth
-        ); 
-            break;
-        default: Curvy.private.consoleOut("ERROR: in private.size.right");
-    }  
+  
+    curvyObj.element.style.right = Curvy.private.size.computeStyle(
+        curvyObj, 
+        window.innerWidth, 
+        CurvyObj.element.parentElement.offsetWidth
+    );
 };
 
 //END CONTROLLERS
