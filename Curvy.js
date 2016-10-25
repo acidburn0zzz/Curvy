@@ -467,7 +467,7 @@ Curvy.private.size.right = function(curvyObj) {
     curvyObj.element.style.right = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerWidth, 
-        CurvyObj.element.parentElement.offsetWidth
+        curvyObj.element.parentElement.offsetWidth
     );
 };
 
