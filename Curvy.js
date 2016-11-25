@@ -1,5 +1,4 @@
 /*
-
     Curvy: A non-linear styling extension.
     
 */
@@ -7,7 +6,7 @@
 
 // Creating Curvy object
 var Curvy = {
-    INFO: { VERSION: 0.02, STABLE: false, USABLE: true },
+    INFO: { VERSION: 0.03, STABLE: false, USABLE: true },
     private: { opts: {}, objs: {}, math: {}, size : {} }, //for methods that shouldn't be accessed outside of this js file.
     get: {}, //for getting things.
     set: {}, //for setting options
@@ -18,6 +17,9 @@ var Curvy = {
 //OPTIONS 
 //Sets logging
 Curvy.private.opts.logging = true;
+//this option forces all ratio-styled elements to size by window ratio regardless of element positioning mode.
+//When set to false Curvy will size by parent Width-Height ratio when positioning mode is not set to 'fixed'
+Curvy.private.opts.forceRatioByWindow = true;
 
 
 //BASIC FUNCTIONS: Basic setup methods. 
@@ -52,15 +54,13 @@ Curvy.private.load = function() {
     Curvy.private.init(); 
     Curvy.private.consoleOut("Initialized Variables...");
     
-    Curvy.private.consoleOut("Processing Curves");
-    
     //Function to process Curves
     Curvy.private.process();
     
     Curvy.private.consoleOut("Adding event handlers...");
     
     //resizing call
-    window.addEventListener('resize', Curvy.private.size.onResize);
+    //window.addEventListener('resize', Curvy.private.size.onResize);
     
     
     Curvy.private.consoleOut("Loaded...");
@@ -75,7 +75,7 @@ Curvy.private.process = function() {
     Curvy.private.processAllOfType(Curvy.private.objs.allCheight);
     Curvy.private.processAllOfType(Curvy.private.objs.allCtop);
     Curvy.private.processAllOfType(Curvy.private.objs.allCbottom);
-    Curvy.private.processAllofType(Curvy.private.objs.allCleft);
+    Curvy.private.processAllOfType(Curvy.private.objs.allCleft);
     Curvy.private.processAllOfType(Curvy.private.objs.allCright);
     
 };
@@ -145,6 +145,15 @@ Curvy.private.parseCurve = function(value) {
         case "linear": cos = Curvy.get.linearCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
         case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
+            break;
+        case ">":
+        case "<":
+        case "=": cos = {
+                a: vo.x1,
+                b: vo.x2,
+                c: vo.y1,
+                d: vo.y2
+            };
             break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
     }
@@ -227,6 +236,15 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
             break;
         case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
+        case ">":
+        case "<":
+        case "=": cos = {
+                a: vo.x1,
+                b: vo.x2,
+                c: vo.y1,
+                d: vo.y2
+            };
+            break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
             return null;
     }
@@ -244,7 +262,7 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
 //process default curvy value
 Curvy.private.processCurvyAttr = function(attrValue) {
     
-    var temp = [];
+    var temp;
     
     var valueObject = {
         type: "",
@@ -260,8 +278,8 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     
     atts = attrValue.split(' ');
     
-    //error checking, if atts is not 5 then error NEEDS MORE ERROR CHECKING!!! 
-    if(atts.length >= 5) {
+     //error checking, if atts is not 5 then error. NEEDS MORE ERROR CHECKING!!! 
+    if(atts.length >= 5 || atts[2] != '?') {
         valueObject.type = atts[0];
         
         if(atts[2].match(/:/i) != null || atts[4].match(/:/i) != null) {
@@ -279,15 +297,41 @@ Curvy.private.processCurvyAttr = function(attrValue) {
             
             valueObject.mode = 1;
             
-            
         } else {
             valueObject.x1 = Number(atts[1].replace(/px/i, ""));
             valueObject.y1 = Number(atts[2].replace(/%/i, ""));
             valueObject.x2 = Number(atts[3].replace(/px/i, ""));
             valueObject.y2 = Number(atts[4].replace(/%/i, ""));
         }
-    } else 
+    } else if(atts.length == 6) {
+        
+        valueObject.x1 = atts[0];
+        
+        if(atts[1].match() != null) {
+            temp = atts[1].split(':');
+            valueObject.x2 = Number(temp[0])/Number(temp[1]);
+            valueObject.mode = 1
+        } else {
+            valueObject.x2 = Number(atts[1].replace(/px/i,""));
+            valueObject.mode = 0;
+        }   
+        
+        valueObject.y1 = Number(atts[3]);
+        valueObject.y2 = Number(atts[5]);
+        
+    } else if(atts.length == 2 && atts[2].match(/:/i) != null) {
+        
+        valueObject.x1 = atts[0];
+        
+        temp = atts[1].split(':');
+        
+        valueObject.y1 = atts[0]; 
+        
+        //new mode for display and display like attributes. AKA true or false statements.
+        valueObject.mode = 2;
+    } else
         Curvy.private.consoleOut("ERROR: Invalid Curvy Value");
+        
         
     
     return valueObject;
@@ -305,7 +349,7 @@ Curvy.private.processCurvyAttr = function(attrValue) {
 Curvy.private.size.linear = function(curvyObj, fixedX, normalX) {
     var y = 0; 
     
-    if(getComputedStyle(curvyObj.element).position == "fixed")
+    if(getComputedStyle(curvyObj.element).position == "fixed" || (Curvy.private.opts.forceRatioByWindow && curvyObj.mode == 1))
         y = curvyObj.icos.a*fixedX + curvyObj.icos.b;
     else
         y = curvyObj.icos.a*normalX + curvyObj.icos.b;
@@ -316,7 +360,7 @@ Curvy.private.size.linear = function(curvyObj, fixedX, normalX) {
 //default sizing for default
 Curvy.private.size.default = function(curvyObj, fixedX, normalX) {
     var y = 0; 
-    if(getComputedStyle(curvyObj.element).position == "fixed") 
+    if(getComputedStyle(curvyObj.element).position == "fixed" || (Curvy.private.opts.forceRatioByWindow && curvyObj.mode == 1)) 
         y = curvyObj.icos.a*Math.pow(fixedX, -1) + curvyObj.icos.b; 
     else  
         y = curvyObj.icos.a*Math.pow(normalX, -1) + curvyObj.icos.b;
@@ -328,7 +372,7 @@ Curvy.private.size.default = function(curvyObj, fixedX, normalX) {
 //default sizing for tan
 Curvy.private.size.tanh = function(curvyObj, fixedX, normalX) {
     var y = 0;
-    if(getComputedStyle(curvyObj.element).position == "fixed")
+    if(getComputedStyle(curvyObj.element).position == "fixed" || (Curvy.private.opts.forceRatioByWindow && curvyObj.mode == 1))
         y = curvyObj.icos.a*Math.tanh(
             curvyObj.icos.c*fixedX + curvyObj.icos.d
         ) + curvyObj.icos.b;
@@ -340,6 +384,35 @@ Curvy.private.size.tanh = function(curvyObj, fixedX, normalX) {
     return y + "%";
 };
 
+Curvy.private.size.ternary = function(CurvyObj, fixed, normalX) {
+    var y = 0;
+    var x = null;
+    
+    if(getComputedStyle(curvyObj.element).position == "fixed" || (Curvy.private.opts.forceRatioByWindow && curvyObj.mode == 1))
+        x = fixed;     
+    else
+        x = normalX;
+    
+    y = CurvyObj.icos.d;
+    
+    switch(CurvyObj.icos.a) {
+        case ">": 
+            if(x > CurvyObj.icos.b)
+                y = CurvyObj.icos.c;
+            break;
+        case "<":
+            if(x < CurvyObj.icos.b)
+                y = CurvyObj.icos.c;
+            break;
+        case "=":
+            if(x == CurvyObj.icos.b)
+                y = CurvyObj.icos.c;
+            break;
+        default:
+    }
+    
+    return y + "%";
+};
 
 //END DEFAULT SIZING TOOLS
 
@@ -354,7 +427,7 @@ Curvy.get.windowRatio = function(element) {
 };
 
 //fixedSize and otherSize are the sizes Curvy uses when element is in either fixed or other positioning
-Curvy.private.size.computeStyle = function(CurvyObj, fixedSize, otherSize) {
+Curvy.private.size.computeStyle = function(curvyObj, fixedSize, otherSize) {
     var finalStyle;
     
     if(curvyObj.mode == 0)
@@ -376,6 +449,14 @@ Curvy.private.size.computeStyle = function(CurvyObj, fixedSize, otherSize) {
                 fixedSize,
                 otherSize
             ); 
+                break;
+            case ">":
+            case "<":
+            case "=": finalStyle = Curvy.private.size.ternary(
+                CurvyObj,
+                fixedSize,
+                otherSize
+            );
                 break;
             default: Curvy.private.consoleOut("ERROR: in private.size.computeStyle");
         }    
@@ -399,6 +480,14 @@ Curvy.private.size.computeStyle = function(CurvyObj, fixedSize, otherSize) {
                 Curvy.get.parentElementRatio(curvyObj.element)
             ); 
                 break;
+            case ">":
+            case "<":
+            case "=": finalStyle = Curvy.private.size.ternary(
+                CurvyObj,
+                Curvy.get.windowRatio(),
+                Curvy.get.parentElementRatio(curvyObj.element)
+            );
+                break;
             default: Curvy.private.consoleOut("ERROR: in private.size.computeStyle");
         }    
     }
@@ -418,7 +507,7 @@ Curvy.private.size.width = function(curvyObj) {
     curvyObj.element.style.width = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerWidth, 
-        CurvyObj.element.parentElement.offsetWidth
+        curvyObj.element.parentElement.offsetWidth
     );
 };
 
@@ -428,7 +517,7 @@ Curvy.private.size.height = function(curvyObj) {
     curvyObj.element.style.height = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerHeight, 
-        CurvyObj.element.parentElement.offsetHeight
+        curvyObj.element.parentElement.offsetHeight
     );
 };
 
@@ -438,7 +527,7 @@ Curvy.private.size.top = function(curvyObj) {
     curvyObj.element.style.top = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerHeight, 
-        CurvyObj.element.parentElement.offsetHeight
+        curvyObj.element.parentElement.offsetHeight
     );
 };
 
@@ -448,7 +537,7 @@ Curvy.private.size.bottom = function(curvyObj) {
     curvyObj.element.style.bottom = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerHeight, 
-        CurvyObj.element.parentElement.offsetHeight
+        curvyObj.element.parentElement.offsetHeight
     );
 };
 
@@ -458,7 +547,7 @@ Curvy.private.size.left = function(curvyObj) {
     curvyObj.element.style.left = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerWidth, 
-        CurvyObj.element.parentElement.offsetWidth
+        curvyObj.element.parentElement.offsetWidth
     );
 };
 
@@ -468,7 +557,7 @@ Curvy.private.size.right = function(curvyObj) {
     curvyObj.element.style.right = Curvy.private.size.computeStyle(
         curvyObj, 
         window.innerWidth, 
-        CurvyObj.element.parentElement.offsetWidth
+        curvyObj.element.parentElement.offsetWidth
     );
 };
 
@@ -519,6 +608,7 @@ Curvy.private.math.getMatrixInverse22 = function(matrix) {
     var det;
     var invmatrix = [0,0,0,0];
     
+    
     if(matrix.length == 4) {
         
         //checks to see if matrix is invertable
@@ -536,6 +626,8 @@ Curvy.private.math.getMatrixInverse22 = function(matrix) {
                 
         }
     }
+    
+    //alert(invmatrix[0]);
     
     return  invmatrix;
 };
@@ -590,11 +682,11 @@ Curvy.get.tanhCos = function(x1, y1, x2, y2) {
     };
     
     //Values of the inverse matrix is already known for tahn as long as | x1 && x2 | > 2
-    //So var tanhMatrix = [-1, 1, 1, 1]; could ver work
+    var tanhMatrix = [-1, 1, 1, 1];
     //HOWEVER there is a chance the values could be very small so...
     //X1 gets to be the approximate asymtope at the negitive end 
     
-    var tanhMatrix = [-Math.tanh(x1), 1, Math.tanh(x2), 1];
+    //tanhMatrix = [-Math.tanh(x1), 1, Math.tanh(x2), 1];
     
     tanhMatrix = Curvy.private.math.getMatrixInverse22(tanhMatrix);
     
