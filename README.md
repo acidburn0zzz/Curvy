@@ -18,6 +18,7 @@ Use:
             data-curvy-right=""
     
         Attributes in Production:
+            data-curvy-display=""
             data-curvy-margin-top=""
             data-curvy-margin-bottom=""
             data-curvy-margin-left=""

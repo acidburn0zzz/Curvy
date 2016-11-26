@@ -6,7 +6,7 @@
 
 // Creating Curvy object
 var Curvy = {
-    INFO: { VERSION: 0.03, STABLE: false, USABLE: true },
+    INFO: { VERSION: 0.04, STABLE: false, USABLE: false },
     private: { opts: {}, objs: {}, math: {}, size : {} }, //for methods that shouldn't be accessed outside of this js file.
     get: {}, //for getting things.
     set: {}, //for setting options
@@ -60,7 +60,7 @@ Curvy.private.load = function() {
     Curvy.private.consoleOut("Adding event handlers...");
     
     //resizing call
-    //window.addEventListener('resize', Curvy.private.size.onResize);
+    window.addEventListener('resize', Curvy.private.size.onResize);
     
     
     Curvy.private.consoleOut("Loaded...");
@@ -251,6 +251,8 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
     
     curvyObj.icos = cos;
     
+    alert(JSON.stringify(curvyObj));
+    
     Curvy.private.size.Resize(curvyObj);
     
     Curvy.private.consoleOut(curvyObj.type + " curve added using " + curvyObj.attribute + " attribute");
@@ -275,15 +277,15 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     
     var atts = [];
     
-    
     atts = attrValue.split(' ');
     
      //error checking, if atts is not 5 then error. NEEDS MORE ERROR CHECKING!!! 
     if(atts.length >= 5 || atts[2] != '?') {
         valueObject.type = atts[0];
         
-        if(atts[2].match(/:/i) != null || atts[4].match(/:/i) != null) {
+        if(atts[1].search(/:/i) > 0 || atts[3].search(/:/i) > 0) {
             //if screen res 
+            
             valueObject.y1 = Number(atts[2].replace(/%/i, ""));
             valueObject.y2 = Number(atts[4].replace(/%/i, ""));
             
@@ -305,9 +307,9 @@ Curvy.private.processCurvyAttr = function(attrValue) {
         }
     } else if(atts.length == 6) {
         
-        valueObject.x1 = atts[0];
+        valueObject.type = atts[0];
         
-        if(atts[1].match() != null) {
+        if(atts[1].search() > 0) {
             temp = atts[1].split(':');
             valueObject.x2 = Number(temp[0])/Number(temp[1]);
             valueObject.mode = 1
@@ -316,10 +318,10 @@ Curvy.private.processCurvyAttr = function(attrValue) {
             valueObject.mode = 0;
         }   
         
-        valueObject.y1 = Number(atts[3]);
-        valueObject.y2 = Number(atts[5]);
+        valueObject.y1 = Number(atts[3].replace(/%/i,""));
+        valueObject.y2 = Number(atts[5].replace(/%/i,""));
         
-    } else if(atts.length == 2 && atts[2].match(/:/i) != null) {
+    } else if(atts.length == 2 && atts[2].search(/:/i) > 0) {
         
         valueObject.x1 = atts[0];
         
@@ -384,7 +386,7 @@ Curvy.private.size.tanh = function(curvyObj, fixedX, normalX) {
     return y + "%";
 };
 
-Curvy.private.size.ternary = function(CurvyObj, fixed, normalX) {
+Curvy.private.size.ternary = function(curvyObj, fixed, normalX) {
     var y = 0;
     var x = null;
     
@@ -393,20 +395,20 @@ Curvy.private.size.ternary = function(CurvyObj, fixed, normalX) {
     else
         x = normalX;
     
-    y = CurvyObj.icos.d;
+    y = curvyObj.icos.d;
     
-    switch(CurvyObj.icos.a) {
+    switch(curvyObj.type) {
         case ">": 
-            if(x > CurvyObj.icos.b)
-                y = CurvyObj.icos.c;
+            if(x > curvyObj.icos.b)
+                y = curvyObj.icos.c;
             break;
         case "<":
-            if(x < CurvyObj.icos.b)
-                y = CurvyObj.icos.c;
+            if(x < curvyObj.icos.b)
+                y = curvyObj.icos.c;
             break;
         case "=":
-            if(x == CurvyObj.icos.b)
-                y = CurvyObj.icos.c;
+            if(x == curvyObj.icos.b)
+                y = curvyObj.icos.c;
             break;
         default:
     }
@@ -674,6 +676,7 @@ Curvy.get.linearCos = function(x1, y1, x2, y2) {
 //get tanh coefficients
 Curvy.get.tanhCos = function(x1, y1, x2, y2) {
  
+    
     var vec = {
         a: 0,
         b: 0,
