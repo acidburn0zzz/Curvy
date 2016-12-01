@@ -146,9 +146,7 @@ Curvy.private.parseCurve = function(value) {
             break;
         case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
-        case ">":
-        case "<":
-        case "=": cos =  Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
+        case "ternary": cos =  Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
             break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
     }
@@ -230,9 +228,7 @@ Curvy.private.processCurvyTag = function(htmlObj, attrName) {
             break;
         case "tanh": curvyObj.icos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
-        case ">":
-        case "<":
-        case "=": curvyObj.icos = Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
+        case "ternary": curvyObj.icos = Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
             break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
             return null;
@@ -295,7 +291,7 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     } else if(atts.length == 6) {
         
         valueObject.x1 = atts[0];
-        valueObject.type = atts[0];
+        valueObject.type = "ternary";
        
         
         if(atts[1].search(/:/i) > 0) {
@@ -442,9 +438,7 @@ Curvy.private.size.computeStyle = function(curvyObj, fixedSize, otherSize) {
                 otherSize
             ); 
                 break;
-            case ">":
-            case "<":
-            case "=": finalStyle = Curvy.private.size.ternary(
+            case "ternary": finalStyle = Curvy.private.size.ternary(
                 curvyObj,
                 fixedSize,
                 otherSize
@@ -472,9 +466,7 @@ Curvy.private.size.computeStyle = function(curvyObj, fixedSize, otherSize) {
                 Curvy.get.parentElementRatio(curvyObj.element)
             ); 
                 break;
-            case ">":
-            case "<":
-            case "=": finalStyle = Curvy.private.size.ternary(
+            case "ternary": finalStyle = Curvy.private.size.ternary(
                 curvyObj,
                 Curvy.get.windowRatio(),
                 Curvy.get.parentElementRatio(curvyObj.element)
