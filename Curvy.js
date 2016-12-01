@@ -148,12 +148,7 @@ Curvy.private.parseCurve = function(value) {
             break;
         case ">":
         case "<":
-        case "=": cos = {
-                a: vo.x1,
-                b: vo.x2,
-                c: vo.y1,
-                d: vo.y2
-            };
+        case "=": cos =  Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
             break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
     }
@@ -223,35 +218,26 @@ Curvy.private.size.onResize = function() {
 Curvy.private.processCurvyTag = function(htmlObj, attrName) {
     var vo = Curvy.private.processCurvyAttr(htmlObj.getAttribute(attrName));
     
-    //new object to use for tag resize this will probaly be the standard obj
-    var curvyObj = new CurvyObj(vo.type, attrName, htmlObj, {}, vo.mode);
-    
     var cos = {};
     
+    //new object to use for tag resize this will probaly be the standard obj
+    var curvyObj = new CurvyObj(vo.type, attrName, htmlObj, cos, vo.mode);
     
     switch(vo.type) {
-        case "default": cos = Curvy.get.defaultCos(vo.x1, vo.y1, vo.x2, vo.y2);
+        case "default": curvyObj.icos = Curvy.get.defaultCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
-        case "linear": cos = Curvy.get.linearCos(vo.x1, vo.y1, vo.x2, vo.y2);
+        case "linear": curvyObj.icos = Curvy.get.linearCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
-        case "tanh": cos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
+        case "tanh": curvyObj.icos = Curvy.get.tanhCos(vo.x1, vo.y1, vo.x2, vo.y2);
             break;
         case ">":
         case "<":
-        case "=": cos = {
-                a: vo.x1,
-                b: vo.x2,
-                c: vo.y1,
-                d: vo.y2
-            };
+        case "=": curvyObj.icos = Curvy.get.ternaryCos(vo.x1, vo.x2, vo.y1, vo.y2);
             break;
         default: Curvy.private.consoleOut("ERROR: " + vo.type + " is not a valid curve...");
             return null;
     }
     
-    curvyObj.icos = cos;
-    
-    alert(JSON.stringify(curvyObj));
     
     Curvy.private.size.Resize(curvyObj);
     
@@ -280,7 +266,7 @@ Curvy.private.processCurvyAttr = function(attrValue) {
     atts = attrValue.split(' ');
     
      //error checking, if atts is not 5 then error. NEEDS MORE ERROR CHECKING!!! 
-    if(atts.length >= 5 || atts[2] != '?') {
+    if(atts.length == 5 || atts[2] != '?') {
         valueObject.type = atts[0];
         
         if(atts[1].search(/:/i) > 0 || atts[3].search(/:/i) > 0) {
@@ -299,6 +285,7 @@ Curvy.private.processCurvyAttr = function(attrValue) {
             
             valueObject.mode = 1;
             
+            
         } else {
             valueObject.x1 = Number(atts[1].replace(/px/i, ""));
             valueObject.y1 = Number(atts[2].replace(/%/i, ""));
@@ -307,12 +294,15 @@ Curvy.private.processCurvyAttr = function(attrValue) {
         }
     } else if(atts.length == 6) {
         
+        valueObject.x1 = atts[0];
         valueObject.type = atts[0];
+       
         
-        if(atts[1].search() > 0) {
+        if(atts[1].search(/:/i) > 0) {
+            
             temp = atts[1].split(':');
             valueObject.x2 = Number(temp[0])/Number(temp[1]);
-            valueObject.mode = 1
+            valueObject.mode = 1;
         } else {
             valueObject.x2 = Number(atts[1].replace(/px/i,""));
             valueObject.mode = 0;
@@ -397,7 +387,7 @@ Curvy.private.size.ternary = function(curvyObj, fixed, normalX) {
     
     y = curvyObj.icos.d;
     
-    switch(curvyObj.type) {
+    switch(curvyObj.icos.a) {
         case ">": 
             if(x > curvyObj.icos.b)
                 y = curvyObj.icos.c;
@@ -455,7 +445,7 @@ Curvy.private.size.computeStyle = function(curvyObj, fixedSize, otherSize) {
             case ">":
             case "<":
             case "=": finalStyle = Curvy.private.size.ternary(
-                CurvyObj,
+                curvyObj,
                 fixedSize,
                 otherSize
             );
@@ -485,7 +475,7 @@ Curvy.private.size.computeStyle = function(curvyObj, fixedSize, otherSize) {
             case ">":
             case "<":
             case "=": finalStyle = Curvy.private.size.ternary(
-                CurvyObj,
+                curvyObj,
                 Curvy.get.windowRatio(),
                 Curvy.get.parentElementRatio(curvyObj.element)
             );
@@ -702,6 +692,18 @@ Curvy.get.tanhCos = function(x1, y1, x2, y2) {
     
     vec.c = linVec.a;
     vec.d = linVec.b;
+    
+    return vec;
+};
+
+Curvy.get.ternaryCos = function(test, compare, y1, y2) {
+    
+    var vec = {
+        a: test,
+        b: compare,
+        c: y1,
+        d: y2
+    };
     
     return vec;
 };
