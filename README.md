@@ -1,12 +1,12 @@
 **Note: This Document is for personal reference.**
 
 ###Description: 
-    Curvy is a an easy to use layout tool that allows the sizing and positioning of HTML elements to follow non-linear paths as the screen width and height increase/decrease. When used correctly, Curvy can keep a website looking great on a wide varitey of screen sizes. 
+Curvy is a an easy to use layout tool that allows the sizing and positioning of HTML elements to follow non-linear paths as the screen width and height increase/decrease. When used correctly, Curvy can keep a website looking great on a wide varitey of screen sizes. 
     
 However, It is mostly used for quick and dirty prototyping. 
     
 ###Use: 
-    Curvy makes use of custom data attributes such as data-curvy-width="" to add non-linear styling. As of now a method to implement Curvy into CSS style sheets has not been found. Although using the "data-" prefix is recommended in a production environment it may be removed for prototyping.
+Curvy makes use of custom data attributes such as data-curvy-width="" to add non-linear styling. As of now a method to implement Curvy into CSS style sheets has not been found. Although using the "data-" prefix is recommended in a production environment it may be removed for prototyping.
     
     
         Currently Supported Attributes:
