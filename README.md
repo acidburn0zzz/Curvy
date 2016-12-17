@@ -5,7 +5,7 @@
     
 However, It is mostly used for quick and dirty prototyping. 
     
-Use: 
+###Use: 
     Curvy makes use of custom data attributes such as data-curvy-width="" to add non-linear styling. As of now a method to implement Curvy into CSS style sheets has not been found. Although using the "data-" prefix is recommended in a production environment it may be removed for prototyping.
     
     
@@ -28,16 +28,15 @@ Use:
             data-curvy-padding-right=""
     
     
-    No matter what the attribute, Curvy accepts the same value type.
+No matter what the attribute, Curvy accepts the same value type.
     
         A width example: data-curvy-width="default 300 16 1200 5" 
         
         Another width example: curvy-width="tanh 4:3 20% 16:9 15%"
     
-    The first element in the attribute value is the curve type. The default curve is
-    the derivitive of ln(x) or 1/x. The other four attribute values are the begining and end of the curve you would like an element to follow. The first example above would produce a default curve that outputs a width value of 16% when the parent element (or window) is 300px wide and 5% when the parent element is 1200px wide. The second example sets a 20% width when the screen or parent width-to-height ratio is 4:3 and 15% when the ratio is 16:9. 
+The first element in the attribute value is the curve type. The default curve is the derivitive of ln(x) or 1/x. The other four attribute values are the begining and end of the curve you would like an element to follow. The first example above would produce a default curve that outputs a width value of 16% when the parent element (or window) is 300px wide and 5% when the parent element is 1200px wide. The second example sets a 20% width when the screen or parent width-to-height ratio is 4:3 and 15% when the ratio is 16:9. 
     
-        To Clarfiy the Above example one more time:
+To Clarfiy the Above example one more time:
         
             data-curvy-width="default 300px 16% 1200px 5%"
             
@@ -50,24 +49,24 @@ Use:
         
         Curvy finds a suitable a and b value so that the curve will flow through both values.
         
-        NOTE: As of now curvy does hold minamal support for adding measurments to curvy values. For Example, data-curvy-width="default 300px 16% 1200px 5%" is completly acceptable input. However, there is no reason to include these measurments and they effectivly hold no meaning to curvy. They are simply discarded.  
+*NOTE: As of now curvy does hold minamal support for adding measurments to curvy values. For Example, data-curvy-width="default 300px 16% 1200px 5%" is completly acceptable input. However, there is no reason to include these measurments and they effectivly hold no meaning to curvy. They are simply discarded.*
     
-    As of now only the following curves are supoprted: 
+As of now only the following curves are supoprted: 
         
         default         The default curve using the dereivitive of natural log (1/x)
         linear          A very simple linear curve. Essentially useless for production.
         tanh            A curve utilizing hyperbolic tangent. 
         
-    It is possible to apply curves to an entire CSS class in javascript:
+It is possible to apply curves to an entire CSS class in javascript:
         
         Curvy.set.newCurve("curvy-class curvy-width tanh 4:3 20% 21:9 12%");
         
-    The last 5 attributes are identical to that of the Curvy HTML attributes. The first attribute is the class name, and the second attribute is the name of the Curvy HTML attribute that is supposed to be applied to the class.  
+The last 5 attributes are identical to that of the Curvy HTML attributes. The first attribute is the class name, and the second attribute is the name of the Curvy HTML attribute that is supposed to be applied to the class.  
     
         
 ###Development: 
 
-    As of now, Curvy is for my own personal use. However, since Curvy.js rests on github publicly, contributions are more than welcome. Please fork the project and suggest improvements if you wish. Thanks! 
+As of now, Curvy is for my own personal use. However, since Curvy.js rests on github publicly, contributions are more than welcome. Please fork the project and suggest improvements if you wish. Thanks! 
     
     
     
