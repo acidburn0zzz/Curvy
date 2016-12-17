@@ -51,7 +51,7 @@ To Clarfiy the Above example one more time:
         
 *NOTE: As of now curvy does hold minamal support for adding measurments to curvy values. For Example, data-curvy-width="default 300px 16% 1200px 5%" is completly acceptable input. However, there is no reason to include these measurments and they effectivly hold no meaning to curvy. They are simply discarded.*
     
-As of now only the following curves are supoprted: 
+As of now only the following curves are supported: 
         
         default         The default curve using the dereivitive of natural log (1/x)
         linear          A very simple linear curve. Essentially useless for production.
